@@ -1,0 +1,86 @@
+{% extends 'layouts/app.html' %}
+{% block title %} Home {% endblock %}
+{% set active_page = "home" %}
+
+{% block content %}
+
+
+    <div class="bg-gray-100 dark:bg-gray-800">
+        <div class="mx-auto max-w-screen-xl py-8 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Sales Analytics</h1>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="w-90 h-16 bg-gray-200 dark:bg-gray-700 mx-4">
+            <div class="flex items-center justify-center space-x-4 mx-4">
+                <div>
+                    <label for="start-date" class="text-sm text-gray-700 dark:text-gray-300">Start Date</label>
+                    <input type="date" id="start-date" name="start-date" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="end-date" class="text-sm text-gray-700 dark:text-gray-300">End Date</label>
+                    <input type="date" id="end-date" name="end-date" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="city" class="text-sm text-gray-700 dark:text-gray-300">City</label>
+                    <select id="city" name="city" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for c in cities %}
+                            <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="region" class="text-sm text-gray-700 dark:text-gray-300">Region</label>
+                    <select id="region" name="region" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for r in regions %}
+                            <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="state" class="text-sm text-gray-700 dark:text-gray-300">State</label>
+                    <select id="state" name="state" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for s in states %}
+                            <option value="{{ s }}">{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="country" class="text-sm text-gray-700 dark:text-gray-300">Country</label>
+                    <select id="country" name="country" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for co in countries %}
+                            <option value="{{ co }}">{{ co }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="category" class="text-sm text-gray-700 dark:text-gray-300">Category</label>
+                    <select id="category" name="category" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for ca in categories%}
+                            <option value="{{ ca }}">{{ ca }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="segment" class="text-sm text-gray-700 dark:text-gray-300">Segment</label>
+                    <select id="segment" name="segment" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        {% for se in segments%}
+                            <option value="{{ se }}">{{ se }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- End of Filter Section -->
+
+
+
+    </div>
+{% endblock %}

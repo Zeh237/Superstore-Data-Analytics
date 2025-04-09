@@ -413,7 +413,7 @@ class SalesAnalysis:
         df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
         return df.to_dict(orient="records")
 
-    def profit_per_unit_per_unit_product_in_category(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None, state=None,
+    def profit_per_unit_product_in_category(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None, state=None,
                              region=None, segment=None):
 
         query = """
