@@ -6,7 +6,6 @@ sales_analytics = SalesAnalysis()
 utils = Utils()
 web = Blueprint('web', __name__)
 
-@web.route('/')
 @web.route('/home')
 def home():
     return render_template('web/sales_analytics.html')
@@ -129,7 +128,7 @@ def sales_analysis():
     else:
         return render_template("sales_analytics.html", error="Invalid data_type. Please specify a valid data_type.")
 
-@web.route("/homepage")
+@web.route("/")
 def homepage():
     states = utils.get_state()
     ship_modes = utils.get_ship_mode()
@@ -138,8 +137,24 @@ def homepage():
     countries = utils.get_country()
     categories = utils.get_category()
     segments = utils.get_segment()
+
+    data_type = request.args.get("data_type", "all")
+    start_date = request.args.get("start_date", None)
+    end_date = request.args.get("end_date", None)
+    region = request.args.get("region", None)
+    country = request.args.get("country", None)
+    ship_mode = request.args.get("ship_mode", None)
+    segment = request.args.get("segment", None)
+    category = request.args.get("category", None)
+    sub_category = request.args.get("sub_category", None)
+    state = request.args.get("state", None)
+    city = request.args.get("city", None)
+
+    sales_and_profit_sum = sales_analytics.sales_and_profit_sum(start_date, end_date, ship_mode, country, city,
+                                                                state, region, category, sub_category, segment)
+
     return render_template("web/sales_analytics.html", states=states, ship_modes=ship_modes, cities=cities, regions=regions,
-                           countries=countries, categories=categories, segments=segments)
+                           countries=countries, categories=categories, segments=segments, sales_and_profit_sum=sales_and_profit_sum)
 
 
 

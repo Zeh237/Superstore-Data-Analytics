@@ -3,84 +3,105 @@
 {% set active_page = "home" %}
 
 {% block content %}
-
-
     <div class="bg-gray-100 dark:bg-gray-800">
         <div class="mx-auto max-w-screen-xl py-8 px-4 sm:px-6 lg:px-8">
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Sales Analytics</h1>
-        </div>
 
-        <!-- Filter Section -->
-        <div class="w-90 h-16 bg-gray-200 dark:bg-gray-700 mx-4">
-            <div class="flex items-center justify-center space-x-4 mx-4">
-                <div>
-                    <label for="start-date" class="text-sm text-gray-700 dark:text-gray-300">Start Date</label>
-                    <input type="date" id="start-date" name="start-date" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                </div>
+            <!-- Main content container with consistent width -->
+            <div class="w-full space-y-4 mt-4">
+                <!-- Filters form -->
+                <form method="GET" action="{{ url_for('web.homepage') }}" class="w-full bg-white dark:bg-gray-500 shadow-md rounded-md p-3">
+                    <div class="flex flex-wrap items-center justify-center gap-4">
+                        <div class="w-full sm:w-auto">
+                            <label for="start-date" class="text-sm text-gray-700 dark:text-gray-300">Start Date</label>
+                            <input type="date" id="start-date" name="start_date" value="{{ request.args.get('start_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
 
-                <div>
-                    <label for="end-date" class="text-sm text-gray-700 dark:text-gray-300">End Date</label>
-                    <input type="date" id="end-date" name="end-date" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="end-date" class="text-sm text-gray-700 dark:text-gray-300">End Date</label>
+                            <input type="date" id="end-date" name="end_date" value="{{ request.args.get('end_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
 
-                <div>
-                    <label for="city" class="text-sm text-gray-700 dark:text-gray-300">City</label>
-                    <select id="city" name="city" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for c in cities %}
-                            <option value="{{ c }}">{{ c }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="city" class="text-sm text-gray-700 dark:text-gray-300">City</label>
+                            <select id="city" name="city" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Cities</option>
+                                {% for c in cities %}
+                                    <option value="{{ c }}" {% if request.args.get('city') == c %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="region" class="text-sm text-gray-700 dark:text-gray-300">Region</label>
-                    <select id="region" name="region" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for r in regions %}
-                            <option value="{{ r }}">{{ r }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="region" class="text-sm text-gray-700 dark:text-gray-300">Region</label>
+                            <select id="region" name="region" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Regions</option>
+                                {% for r in regions %}
+                                    <option value="{{ r }}" {% if request.args.get('region') == r %}selected{% endif %}>{{ r }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="state" class="text-sm text-gray-700 dark:text-gray-300">State</label>
-                    <select id="state" name="state" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for s in states %}
-                            <option value="{{ s }}">{{ s }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="state" class="text-sm text-gray-700 dark:text-gray-300">State</label>
+                            <select id="state" name="state" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All States</option>
+                                {% for s in states %}
+                                    <option value="{{ s }}" {% if request.args.get('state') == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="country" class="text-sm text-gray-700 dark:text-gray-300">Country</label>
-                    <select id="country" name="country" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for co in countries %}
-                            <option value="{{ co }}">{{ co }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="country" class="text-sm text-gray-700 dark:text-gray-300">Country</label>
+                            <select id="country" name="country" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Countries</option>
+                                {% for co in countries %}
+                                    <option value="{{ co }}" {% if request.args.get('country') == co %}selected{% endif %}>{{ co }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="category" class="text-sm text-gray-700 dark:text-gray-300">Category</label>
-                    <select id="category" name="category" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for ca in categories%}
-                            <option value="{{ ca }}">{{ ca }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="category" class="text-sm text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="category" name="category" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Categories</option>
+                                {% for ca in categories %}
+                                    <option value="{{ ca }}" {% if request.args.get('category') == ca %}selected{% endif %}>{{ ca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="segment" class="text-sm text-gray-700 dark:text-gray-300">Segment</label>
-                    <select id="segment" name="segment" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
-                        {% for se in segments%}
-                            <option value="{{ se }}">{{ se }}</option>
-                        {% endfor %}
-                    </select>
+                        <div class="w-full sm:w-auto">
+                            <label for="segment" class="text-sm text-gray-700 dark:text-gray-300">Segment</label>
+                            <select id="segment" name="segment" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Segments</option>
+                                {% for se in segments %}
+                                    <option value="{{ se }}" {% if request.args.get('segment') == se %}selected{% endif %}>{{ se }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto flex items-end">
+                            <button type="submit" class="h-[42px] px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- sales and profit sum cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                    {% for label, value in {"Total Sales": sales_and_profit_sum.get("Sales", 0), "Total Profit": sales_and_profit_sum.get("Profit", 0)}.items() %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3">
+                        <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ label }}</h2>
+                        <p class="text-lg font-bold text-gray-700 dark:text-gray-300">
+                            ${{ "%.2f" | format(value) }}
+                        </p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        <!-- End of Filter Section -->
-
-
-
     </div>
 {% endblock %}
