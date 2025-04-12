@@ -1,6 +1,6 @@
 {% extends 'layouts/app.html' %}
 {% block title %} Home {% endblock %}
-{% set active_page = "home" %}
+{% set active_page = "Sales" %}
 
 {% block content %}
     <div class="bg-gray-100 dark:bg-gray-800">
@@ -101,7 +101,367 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                <!-- sales profits profit margin per year bar chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sales, Profit & Profit Margin by Year</h2>
+                    <div class="relative h-80">
+                        <canvas id="yearlyMetricsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Year-over-Year Growth Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Year-over-Year Growth (%)</h2>
+                    <div class="relative h-80">
+                        <canvas id="yoyGrowthChart"></canvas>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block footer_script %}
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+<script>
+// sales, profit, profit margin chart
+document.addEventListener('DOMContentLoaded', function() {
+    const yearlyData = {{ sales_profit_profit_margin_per_year | tojson | safe }};
+
+    // Check if we have data to plot
+    if (!yearlyData || yearlyData.length === 0) {
+        document.getElementById('yearlyMetricsChart').innerHTML =
+            '<p class="text-center text-gray-500 dark:text-gray-300">No data available for the selected filters</p>';
+        return;
+    }
+
+    // Preparing data for Chart.js
+    const years = yearlyData.map(item => item.year);
+    const sales = yearlyData.map(item => item.Total_Sales);
+    const profits = yearlyData.map(item => item.Total_Profit);
+    const profitMargins = yearlyData.map(item => (item.Profit_margin * 100).toFixed(2));
+
+    const ctx = document.getElementById('yearlyMetricsChart').getContext('2d');
+
+    // Theme colors
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+    const backgroundColors = isDarkMode ? [
+        'rgba(99, 102, 241, 0.8)',  // Indigo-500
+        'rgba(16, 185, 129, 0.8)',  // Emerald-500
+        'rgba(245, 158, 11, 0.8)'   // Amber-500
+    ] : [
+        'rgba(79, 70, 229, 0.8)',   // Indigo-600
+        'rgba(5, 150, 105, 0.8)',   // Emerald-600
+        'rgba(217, 119, 6, 0.8)'    // Amber-600
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: years,
+            datasets: [
+                {
+                    label: 'Sales ($)',
+                    data: sales,
+                    backgroundColor: backgroundColors[0],
+                    borderColor: isDarkMode ? 'rgba(129, 140, 248, 1)' : 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                },
+                {
+                    label: 'Profit ($)',
+                    data: profits,
+                    backgroundColor: backgroundColors[1],
+                    borderColor: isDarkMode ? 'rgba(52, 211, 153, 1)' : 'rgba(5, 150, 105, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                },
+                {
+                    label: 'Profit Margin (%)',
+                    data: profitMargins,
+                    borderColor: isDarkMode ? 'rgba(251, 191, 36, 1)' : 'rgba(217, 119, 6, 1)',
+                    borderWidth: 2,
+                    backgroundColor: 'transparent',
+                    type: 'line',
+                    yAxisID: 'y1',
+                    pointBackgroundColor: backgroundColors[2],
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            weight: '500'
+                        },
+                        padding: 20,
+                        boxWidth: 12,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    bodyColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.datasetIndex === 2) {
+                                label += context.raw + '%';
+                            } else {
+                                label += '$' + context.raw.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Amount ($)',
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return '$' + value.toLocaleString('en-US', {
+                                maximumFractionDigits: 0
+                            });
+                        }
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Profit Margin (%)',
+                        color: textColor
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                        color: gridColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    min: 0
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+});
+
+
+// yoy growth chart
+document.addEventListener('DOMContentLoaded', function() {
+    const yoyData = {{ sales_profit_profit_margin_year_on_year_growth | tojson | safe }};
+
+    // Check if we have data to plot
+    if (!yoyData || yoyData.length === 0) {
+        document.getElementById('yoyGrowthChart').innerHTML =
+            '<p class="text-center text-gray-500 dark:text-gray-300">No growth data available</p>';
+        return;
+    }
+
+    // Convert NaN values to 0
+    const processedData = yoyData.map(item => ({
+        year: item.year,
+        Sales_YoY_Growth: isNaN(item.Sales_YoY_Growth) ? 0 : item.Sales_YoY_Growth,
+        Profit_YoY_Growth: isNaN(item.Profit_YoY_Growth) ? 0 : item.Profit_YoY_Growth,
+        Profit_margin_YoY_Growth: isNaN(item.Profit_margin_YoY_Growth) ? 0 : item.Profit_margin_YoY_Growth
+    }));
+
+    const years = processedData.map(item => item.year);
+    const salesGrowth = processedData.map(item => item.Sales_YoY_Growth);
+    const profitGrowth = processedData.map(item => item.Profit_YoY_Growth);
+    const marginGrowth = processedData.map(item => item.Profit_margin_YoY_Growth);
+
+    const ctx = document.getElementById('yoyGrowthChart').getContext('2d');
+
+    // Rest of your chart configuration remains the same...
+    // Theme colors (matching previous chart)
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+    const lineColors = [
+        isDarkMode ? 'rgba(99, 102, 241, 0.8)' : 'rgba(79, 70, 229, 0.8)',    // Indigo
+        isDarkMode ? 'rgba(16, 185, 129, 0.8)' : 'rgba(5, 150, 105, 0.8)',    // Emerald
+        isDarkMode ? 'rgba(245, 158, 11, 0.8)' : 'rgba(217, 119, 6, 0.8)'     // Amber
+    ];
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [
+                {
+                    label: 'Sales Growth (%)',
+                    data: salesGrowth,
+                    borderColor: lineColors[0],
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointBackgroundColor: lineColors[0],
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                },
+                {
+                    label: 'Profit Growth (%)',
+                    data: profitGrowth,
+                    borderColor: lineColors[1],
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointBackgroundColor: lineColors[1],
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                },
+                {
+                    label: 'Profit Margin Growth (%)',
+                    data: marginGrowth,
+                    borderColor: lineColors[2],
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    pointBackgroundColor: lineColors[2],
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            weight: '500'
+                        },
+                        padding: 20,
+                        boxWidth: 12,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    bodyColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            label += context.raw.toFixed(2) + '%';
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Growth Percentage (%)',
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            elements: {
+                line: {
+                    fill: false
+                }
+            }
+        }
+    });
+});
+
+
+</script>
 {% endblock %}

@@ -153,8 +153,15 @@ def homepage():
     sales_and_profit_sum = sales_analytics.sales_and_profit_sum(start_date, end_date, ship_mode, country, city,
                                                                 state, region, category, sub_category, segment)
 
+    sales_profit_profit_margin_per_year = sales_analytics.sales_profit_profit_margin_per_year(ship_mode, country, city,
+                                                                state, region, category, sub_category, segment)
+    sales_profit_profit_margin_year_on_year_growth = sales_analytics.sales_profit_profit_margin_year_on_year_growth(
+        ship_mode, country, city, state, region, category, sub_category, segment)
+
+
     return render_template("web/sales_analytics.html", states=states, ship_modes=ship_modes, cities=cities, regions=regions,
-                           countries=countries, categories=categories, segments=segments, sales_and_profit_sum=sales_and_profit_sum)
+                           countries=countries, categories=categories, segments=segments, sales_and_profit_sum=sales_and_profit_sum,
+                           sales_profit_profit_margin_per_year=sales_profit_profit_margin_per_year, sales_profit_profit_margin_year_on_year_growth=sales_profit_profit_margin_year_on_year_growth,)
 
 
 

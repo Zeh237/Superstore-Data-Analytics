@@ -259,7 +259,7 @@ class SalesAnalysis:
         df["Profit_YoY_Growth"] = df["Total_Profit"].pct_change() * 100
         df["Profit_margin_YoY_Growth"] = df["Profit_margin"].pct_change() * 100
 
-        return df[["Total_Sales", "Total_Profit", "Profit_margin", "Sales_YoY_Growth", "Profit_YoY_Growth", "Profit_margin_YoY_Growth"]].to_dict(orient="records")
+        return df[["Sales_YoY_Growth", "Profit_YoY_Growth", "Profit_margin_YoY_Growth", "year"]].to_dict(orient="records")
 
 
     def sales_profit_profit_margin_per_region(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None,
@@ -335,7 +335,7 @@ class SalesAnalysis:
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df["year"] = df["Order Date"].dt.year
 
-        df = df.groupby("year").agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
+        df = df.groupby(["year", "Region"]).agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
         df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
         return df.to_dict(orient="records")
 
