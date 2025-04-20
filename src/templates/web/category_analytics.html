@@ -138,6 +138,13 @@
                     </div>
                 </div>
 
+                <!-- Category Profits Over Years Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Category Profits Over Years</h2>
+                    <div class="relative h-80">
+                        <canvas id="categoryProfitsOverYearsChart"></canvas>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -412,6 +419,170 @@ document.addEventListener('DOMContentLoaded', function() {
                 line: {
                     fill: false
                 }
+            }
+        }
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryProfitsData = {{ top_categories_profit_per_year | tojson | safe }};
+    console.log('Raw profit data:', categoryProfitsData); // Debug log
+
+    // Check if we have data to plot
+    if (!categoryProfitsData || categoryProfitsData.length === 0) {
+        document.getElementById('categoryProfitsOverYearsChart').innerHTML =
+            '<p class="text-center text-gray-500 dark:text-gray-300">No profit data available</p>';
+        return;
+    }
+
+    // Organize data by category and year
+    const categories = [...new Set(categoryProfitsData.map(item => item.Category))];
+    const years = [...new Set(categoryProfitsData.map(item => item.Year))].sort((a, b) => a - b);
+
+    console.log('Categories:', categories); // Debug log
+    console.log('Years:', years); // Debug log
+
+    // Determine dark mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
+    // Prepare dataset for each category
+    const datasets = categories.map((category, index) => {
+        // Color scheme
+        const colors = [
+            'rgba(99, 102, 241, 0.8)',    // Indigo (Furniture)
+            'rgba(16, 185, 129, 0.8)',     // Emerald (Office Supplies)
+            'rgba(245, 158, 11, 0.8)'       // Amber (Technology)
+        ];
+        const darkColors = [
+            'rgba(79, 70, 229, 0.8)',       // Dark indigo
+            'rgba(5, 150, 105, 0.8)',       // Dark emerald
+            'rgba(217, 119, 6, 0.8)'        // Dark amber
+        ];
+
+        // Get profit data for this category
+        const categoryData = categoryProfitsData.filter(item => item.Category === category);
+        const profitValues = years.map(year => {
+            const yearData = categoryData.find(item => item.Year === year);
+            return yearData ? yearData.Total_Profits : null;
+        });
+
+        console.log(`Data for ${category}:`, profitValues); // Debug log
+
+        return {
+            label: category,
+            data: profitValues,
+            borderColor: isDarkMode ? darkColors[index % darkColors.length] : colors[index % colors.length],
+            backgroundColor: 'transparent',
+            borderWidth: 3,
+            tension: 0.1, // Reduced tension for more angular lines
+            pointBackgroundColor: isDarkMode ? darkColors[index % darkColors.length] : colors[index % colors.length],
+            pointBorderColor: '#fff',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            // Style negative values differently
+            segment: {
+                borderColor: ctx => ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0 ?
+                    (isDarkMode ? 'rgba(239, 68, 68, 0.8)' : 'rgba(220, 38, 38, 0.8)') :
+                    (isDarkMode ? darkColors[index % darkColors.length] : colors[index % colors.length]),
+                borderDash: ctx => ctx.p0.parsed.y < 0 || ctx.p1.parsed.y < 0 ? [6, 6] : undefined
+            }
+        };
+    });
+
+    const ctx = document.getElementById('categoryProfitsOverYearsChart').getContext('2d');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+    // Destroy previous chart instance if it exists
+    if (window.categoryProfitsChart) {
+        window.categoryProfitsChart.destroy();
+    }
+
+    window.categoryProfitsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            weight: '500'
+                        },
+                        padding: 20,
+                        boxWidth: 12,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    bodyColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            const value = context.raw;
+                            if (value === null) return label + 'No data';
+                            label += value >= 0 ?
+                                '$' + value.toFixed(2) :
+                                '-$' + Math.abs(value).toFixed(2);
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'category', // Explicitly set as category axis
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    title: {
+                        display: true,
+                        text: 'Year',
+                        color: textColor
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: 'Profit Amount ($)',
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            if (value === null) return '';
+                            return value >= 0 ?
+                                '$' + value.toFixed(0) :
+                                '-$' + Math.abs(value).toFixed(0);
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
             }
         }
     });

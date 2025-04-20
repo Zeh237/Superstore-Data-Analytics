@@ -11,38 +11,52 @@ class SalesAnalysis:
     def sales_and_profit_sum(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None, state=None,
                              region=None, category=None, sub_category=None, segment=None):
         query = """
-            SELECT 
+            SELECT
                 SUM(Sales) AS Total_Sales,
                 SUM(Profit) AS Total_Profit
-            FROM 
+            FROM
                 superstore
-            WHERE 
-                1=1
         """
 
+        conditions = []
+        params = {}
+
         if start_date:
-            query += f" AND `Order Date` >= '{start_date}'"
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            query += f" AND `Order Date` <= '{end_date}'"
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            query += f" AND `Ship Mode` = '{ship_mode}'"
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            query += f" AND Country = '{country}'"
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            query += f" AND City = '{city}'"
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            query += f" AND State = '{state}'"
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            query += f" AND Region = '{region}'"
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            query += f" AND Category = '{category}'"
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            query += f" AND `Sub-Category` = '{sub_category}'"
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            query += f" AND Segment = '{segment}'"
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
 
         with self.engine.connect() as connection:
-            result = connection.execute(text(query))
+            result = connection.execute(text(query), params)
             row = result.fetchone()
 
             if row:
@@ -60,34 +74,45 @@ class SalesAnalysis:
         """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Order Date` ORDER BY 'Order Date' Desc"
+        query += " GROUP BY `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            result = connection.execute(text(query))
+            result = connection.execute(text(query), params)
             sales_data = [{"date": row[0], "sales": row[1]} for row in result.fetchall()]
             return sales_data
 
@@ -96,39 +121,50 @@ class SalesAnalysis:
                                 state=None, region=None, category=None, sub_category=None, segment=None):
 
         query = """
-                    SELECT `Order Date`, SUM(Profit) as Total_Sales
+                    SELECT `Order Date`, SUM(Profit) as Total_Profit
                     FROM superstore
                 """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Order Date` ORDER BY 'Order Date' Desc"
+        query += " GROUP BY `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            result = connection.execute(text(query))
+            result = connection.execute(text(query), params)
             profit_data = [{"date": row[0], "profit": row[1]} for row in result.fetchall()]
             return profit_data
 
@@ -137,41 +173,58 @@ class SalesAnalysis:
                                 state=None, region=None, category=None, sub_category=None, segment=None):
 
         query = """
-            SELECT 'Order Date', SUM(Profit) as profit, SUM(Sales) as sales
+            SELECT `Order Date`, SUM(Profit) as profit, SUM(Sales) as sales
             FROM superstore
         """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Order Date` ORDER BY 'Order Date' Desc"
+        query += " GROUP BY `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            result = connection.execute(text(query))
-            profit_margin_data = [{"date": row[0], "profit": row[1], "sales": row[2], "profit_margin": row[1]/row[2]} for row in result.fetchall()]
-            return profit_margin_data
+            df = pd.read_sql(text(query), connection, params=params)
+
+        df['profit_margin'] = df.apply(lambda row: row['profit'] / row['sales'] if row['sales'] > 0 else 0, axis=1)
+
+        df['Order Date'] = pd.to_datetime(df['Order Date'])
+
+        df = df.rename(columns={'Order Date': 'date'})
+
+        return df.to_dict(orient="records")
 
 
     def sales_profit_profit_margin_per_year(self, ship_mode=None, country=None, city=None,
@@ -182,36 +235,45 @@ class SalesAnalysis:
         """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Order Date` ORDER BY 'Order Date' Desc"
+        query += " GROUP BY `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df["year"] = df["Order Date"].dt.year
 
         df = df.groupby("year").agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
-        df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
         return df.to_dict(orient="records")
 
 
@@ -224,36 +286,45 @@ class SalesAnalysis:
                 """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Order Date` ORDER BY 'Order Date' Desc"
+        query += " GROUP BY `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df["year"] = df["Order Date"].dt.year
 
         df = df.groupby("year").agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
-        df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
 
         df["Sales_YoY_Growth"] = df["Total_Sales"].pct_change() * 100
         df["Profit_YoY_Growth"] = df["Total_Profit"].pct_change() * 100
@@ -270,32 +341,47 @@ class SalesAnalysis:
         """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Region`, `Order Date` ORDER BY `Order Date` Desc"
+        query += " GROUP BY `Region`, `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
+
+        # Convert date column to datetime objects for consistent handling
+        df['Order Date'] = pd.to_datetime(df['Order Date'])
+
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
 
         return df.to_dict(orient="records")
 
@@ -309,34 +395,42 @@ class SalesAnalysis:
                 """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if category:
-            conditions.append(f"Category = '{category}'")
+            conditions.append("Category = :category")
+            params['category'] = category
         if sub_category:
-            conditions.append(f"`Sub-Category` = '{sub_category}'")
+            conditions.append("`Sub-Category` = :sub_category")
+            params['sub_category'] = sub_category
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Region`, `Order Date` ORDER BY `Order Date` Desc"
+        query += " GROUP BY `Region`, `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df["year"] = df["Order Date"].dt.year
 
         df = df.groupby(["year", "Region"]).agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
-        df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
         return df.to_dict(orient="records")
 
     def sales_profit_profit_margin_per_category(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None, state=None,
@@ -348,30 +442,43 @@ class SalesAnalysis:
         """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` Desc"
+        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
+
+        df['Order Date'] = pd.to_datetime(df['Order Date'])
+
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
 
         return df.to_dict(orient="records")
 
@@ -385,32 +492,39 @@ class SalesAnalysis:
                 """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` Desc"
+        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df["year"] = df["Order Date"].dt.year
 
-        df = df.groupby("year").agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
-        df["Profit_margin"] = df["Total_Profit"] / df["Total_Sales"]
+        df = df.groupby(["year", "Category"]).agg({"Total_Sales": "sum", "Total_Profit": "sum"}).reset_index()
+        df["Profit_margin"] = df.apply(lambda row: row['Total_Profit'] / row['Total_Sales'] if row['Total_Sales'] > 0 else 0, axis=1)
         return df.to_dict(orient="records")
 
     def profit_per_unit_product_in_category(self, start_date=None, end_date=None, ship_mode=None, country=None, city=None, state=None,
@@ -422,47 +536,42 @@ class SalesAnalysis:
         """
 
         conditions = []
+        params = {}
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
-
-        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` Desc"
+        query += " GROUP BY `Category`, `Order Date` ORDER BY `Order Date` DESC"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
+        df["ppupc"] = df.apply(lambda row: row['Total_Profit'] / row['Quantity'] if row['Quantity'] > 0 else 0, axis=1)
 
-        df["ppupc"] = df['Total_Profit']/df['Quantity']
         df["Order Date"] = pd.to_datetime(df["Order Date"])
         df['year'] = df['Order Date'].dt.year
         df = df.groupby(['year', 'Category']).agg({'ppupc': 'sum'}).reset_index()
 
         return df.to_dict(orient="records")
-
-# sales_analytics = SalesAnalysis()
-# s = SalesAnalysis()
-# print(s.sales_over_time(category="Office Supplies", start_date="2014-01-01", end_date="2017-12-31"))
-# print(s.profits_over_time(category="Office Supplies", start_date="2014-01-01", end_date="2017-12-31"))
-# print(s.sales_and_profit_sum(start_date="2014-01-01", end_date="2017-12-31"))
-# print(s.sales_profit_profit_margin_per_year())
-# print(s.profit_margins_over_time())
-# print(s.sales_profit_profit_margin_year_on_year_growth())
-# print(s.sales_profit_profit_margin_per_region_per_year())
-# print(s.sales_profit_profit_margin_per_category())
-# print(s.sales_profit_profit_margin_per_category_per_year())
-# print(s.profit_per_unit_per_unit_product_in_category())

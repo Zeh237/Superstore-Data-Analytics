@@ -1,0 +1,313 @@
+{% extends 'layouts/app.html' %}
+{% block title %} Categories {% endblock %}
+{% set active_page = "Categories" %}
+
+{% block content %}
+    <div class="bg-gray-100 dark:bg-gray-800">
+        <div class="mx-auto max-w-screen-xl py-8 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Regional Analytics</h1>
+
+            <!-- Main content container with consistent width -->
+            <div class="w-full space-y-4 mt-4">
+                <!-- Filters form -->
+                <form method="GET" action="{{ url_for('web.regions') }}" class="w-full bg-white dark:bg-gray-500 shadow-md rounded-md p-3">
+                    <div class="flex flex-wrap items-center justify-center gap-4">
+                        <div class="w-full sm:w-auto">
+                            <label for="start-date" class="text-sm text-gray-700 dark:text-gray-300">Start Date</label>
+                            <input type="date" id="start-date" name="start_date" value="{{ request.args.get('start_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="end-date" class="text-sm text-gray-700 dark:text-gray-300">End Date</label>
+                            <input type="date" id="end-date" name="end_date" value="{{ request.args.get('end_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="city" class="text-sm text-gray-700 dark:text-gray-300">City</label>
+                            <select id="city" name="city" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Cities</option>
+                                {% for c in cities %}
+                                    <option value="{{ c }}" {% if request.args.get('city') == c %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="category" class="text-sm text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="category" name="category" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Categories</option>
+                                {% for ca in categories %}
+                                    <option value="{{ ca }}" {% if request.args.get('category') == ca %}selected{% endif %}>{{ ca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="state" class="text-sm text-gray-700 dark:text-gray-300">State</label>
+                            <select id="state" name="state" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All States</option>
+                                {% for s in states %}
+                                    <option value="{{ s }}" {% if request.args.get('state') == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="country" class="text-sm text-gray-700 dark:text-gray-300">Country</label>
+                            <select id="country" name="country" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Countries</option>
+                                {% for co in countries %}
+                                    <option value="{{ co }}" {% if request.args.get('country') == co %}selected{% endif %}>{{ co }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="segment" class="text-sm text-gray-700 dark:text-gray-300">Segment</label>
+                            <select id="segment" name="segment" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Segments</option>
+                                {% for se in segments %}
+                                    <option value="{{ se }}" {% if request.args.get('segment') == se %}selected{% endif %}>{{ se }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto flex items-end">
+                            <button type="submit" class="h-[42px] px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Top City Per Region Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    {% for item in top_city_per_region %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Region }} Region</h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Top City</p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-700 dark:text-gray-200 ml-7">{{ item.Top_Selling_City }}</p>
+
+                            <div class="flex items-center mt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Total Sales</p>
+                            </div>
+                            <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400 ml-7">
+                                ${{ "%.2f" | format(item.Total_Sales_In_City) }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Average Order Value Per Region Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    {% for item in average_order_value_per_region %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Region }} Region</h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Average Order Value</p>
+                            </div>
+                            <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400 ml-7">
+                                ${{ "%.2f" | format(item.Average_Order_Value) }}
+                            </p>
+
+                            <!-- Optional: Add comparison indicator -->
+                            <div class="flex items-center mt-2 text-sm {% if item.Average_Order_Value > 450 %}text-emerald-600 dark:text-emerald-400{% else %}text-amber-600 dark:text-amber-400{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{% if item.Average_Order_Value > 450 %}M5 15l7-7 7 7{% else %}M19 9l-7 7-7-7{% endif %}" />
+                                </svg>
+                                {% if item.Average_Order_Value > 450 %}Above{% else %}Below{% endif %} average
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Unique Customers Per Region Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    {% for item in unique_customer_count_per_region %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Region }} Region</h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Unique Customers</p>
+                            </div>
+                            <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400 ml-7">
+                                {{ item.Unique_Customers }}
+                            </p>
+
+                            <!-- Optional: Percentage of total customers -->
+                            {% set total_customers = unique_customer_count_per_region | sum(attribute='Unique_Customers') %}
+                            <div class="flex items-center mt-2 text-sm text-gray-500 dark:text-gray-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                                {{ "%.1f" | format((item.Unique_Customers / total_customers) * 100) }}% of total
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Regional Sales Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Regional Sales Breakdown</h2>
+                    <div class="relative h-80">
+                        <canvas id="regionalSalesChart"></canvas>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer_script %}
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionalData = {{ regional_sales_per_year | tojson | safe }};
+    console.log('Regional Sales Data:', regionalData); // Debug log
+
+    // Check if we have data to plot
+    if (!regionalData || regionalData.length === 0) {
+        document.getElementById('regionalSalesChart').innerHTML =
+            '<p class="text-center text-gray-500 dark:text-gray-300">No regional sales data available</p>';
+        return;
+    }
+
+    // Sort regions by sales (descending)
+    regionalData.sort((a, b) => b.Total_Sales - a.Total_Sales);
+
+    const regions = regionalData.map(item => item.Region);
+    const sales = regionalData.map(item => item.Total_Sales);
+
+    const ctx = document.getElementById('regionalSalesChart').getContext('2d');
+
+    // Theme colors
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+    const barColors = [
+        'rgba(79, 70, 229, 0.8)',   // Indigo
+        'rgba(16, 185, 129, 0.8)',  // Emerald
+        'rgba(245, 158, 11, 0.8)',  // Amber
+        'rgba(236, 72, 153, 0.8)'   // Pink
+    ].map(color => isDarkMode ? color.replace('0.8', '0.7') : color);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: regions,
+            datasets: [{
+                label: 'Total Sales ($)',
+                data: sales,
+                backgroundColor: barColors,
+                borderColor: barColors.map(color => color.replace('0.7', '1').replace('0.8', '1')),
+                borderWidth: 1,
+                borderRadius: 4,
+                barPercentage: 0.7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    bodyColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + context.raw.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return '$' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Sales Amount',
+                        color: textColor
+                    }
+                }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

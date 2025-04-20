@@ -1,6 +1,5 @@
 import pandas as pd
 from sqlalchemy import text
-
 from src.db_connection.connection import DBConnection
 
 
@@ -18,22 +17,32 @@ class CategoryAnalysis:
         """
 
         conditions = []
+        params = {}
+
         if start_date:
-            conditions.append(f"`Order Date` >= '{start_date}'")
+            conditions.append("`Order Date` >= :start_date")
+            params['start_date'] = start_date
         if end_date:
-            conditions.append(f"`Order Date` <= '{end_date}'")
+            conditions.append("`Order Date` <= :end_date")
+            params['end_date'] = end_date
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -41,7 +50,7 @@ class CategoryAnalysis:
         query += " GROUP BY `Category`"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
 
@@ -54,18 +63,25 @@ class CategoryAnalysis:
         """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -73,34 +89,46 @@ class CategoryAnalysis:
         query += " GROUP BY Year, `Category`"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
 
     def category_profit_per_year(self, ship_mode=None, country=None, city=None, state=None,
-                             region=None, segment=None):
+                         region=None, segment=None):
 
         query = """
-                    SELECT YEAR(`Order Date`) AS Year, `Category`, SUM(`Profit`) AS Total_Profits
-                    FROM superstore
-                    GROUP BY Year, `Category`
-                """
+            SELECT YEAR(`Order Date`) AS Year, `Category`, SUM(`Profit`) AS Total_Profits
+            FROM superstore
+        """
 
+        conditions = []
+        params = {}
         if ship_mode:
-            query += f" AND `Ship Mode` = '{ship_mode}'"
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            query += f" AND Country = '{country}'"
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            query += f" AND City = '{city}'"
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            query += f" AND State = '{state}'"
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            query += f" AND Region = '{region}'"
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            query += f" AND Segment = '{segment}'"
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " GROUP BY Year, `Category`"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
 
@@ -112,18 +140,25 @@ class CategoryAnalysis:
         """
 
         conditions = []
+        params = {}
         if ship_mode:
-            conditions.append(f"`Ship Mode` = '{ship_mode}'")
+            conditions.append("`Ship Mode` = :ship_mode")
+            params['ship_mode'] = ship_mode
         if country:
-            conditions.append(f"Country = '{country}'")
+            conditions.append("Country = :country")
+            params['country'] = country
         if city:
-            conditions.append(f"City = '{city}'")
+            conditions.append("City = :city")
+            params['city'] = city
         if state:
-            conditions.append(f"State = '{state}'")
+            conditions.append("State = :state")
+            params['state'] = state
         if region:
-            conditions.append(f"Region = '{region}'")
+            conditions.append("Region = :region")
+            params['region'] = region
         if segment:
-            conditions.append(f"Segment = '{segment}'")
+            conditions.append("Segment = :segment")
+            params['segment'] = segment
 
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
@@ -131,10 +166,6 @@ class CategoryAnalysis:
         query += " GROUP BY `Category`"
 
         with self.engine.connect() as connection:
-            df = pd.read_sql(text(query), connection)
+            df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
-
-
-s=CategoryAnalysis()
-print(s.category_sales_and_profit_count(region='East'))
