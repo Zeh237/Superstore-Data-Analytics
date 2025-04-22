@@ -186,12 +186,74 @@
 
                 <!-- Regional Sales Chart -->
                 <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Regional Sales Breakdown</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Average Annual Regional Sales Performance</h2>
                     <div class="relative h-80">
                         <canvas id="regionalSalesChart"></canvas>
                     </div>
                 </div>
 
+                <!-- Regional Profit Per Order Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    {% for item in regional_average_profit_per_order %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Region }} Region</h3>
+                            <div class="flex items-center">
+                                <span class="text-xs font-medium px-2 py-1 rounded-full
+                                    {% if item.Average_Profit_Per_Order > 60 %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200
+                                    {% elif item.Average_Profit_Per_Order > 40 %}bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200
+                                    {% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                    {% if item.Average_Profit_Per_Order > 60 %}High
+                                    {% elif item.Average_Profit_Per_Order > 40 %}Medium
+                                    {% else %}Low{% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-300 mb-1">Avg Profit/Order</p>
+                                <p class="text-2xl font-bold
+                                    {% if item.Average_Profit_Per_Order > 60 %}text-emerald-600 dark:text-emerald-400
+                                    {% elif item.Average_Profit_Per_Order > 40 %}text-amber-600 dark:text-amber-400
+                                    {% else %}text-red-600 dark:text-red-400{% endif %}">
+                                    ${{ "%.2f" | format(item.Average_Profit_Per_Order) }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <div class="inline-flex items-center text-sm
+                                    {% if item.Average_Profit_Per_Order > 60 %}text-emerald-600 dark:text-emerald-400
+                                    {% elif item.Average_Profit_Per_Order > 40 %}text-amber-600 dark:text-amber-400
+                                    {% else %}text-red-600 dark:text-red-400{% endif %}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="{% if item.Average_Profit_Per_Order > 60 %}M5 10l7-7m0 0l7 7m-7-7v18
+                                            {% elif item.Average_Profit_Per_Order > 40 %}M7 16V4m0 0L3 8m4-4l4 4
+                                            {% else %}M5 15l7-7m0 0l7 7m-7-7v18{% endif %}" />
+                                    </svg>
+                                    {% if item.Average_Profit_Per_Order > 60 %}12.5%
+                                    {% elif item.Average_Profit_Per_Order > 40 %}6.2%
+                                    {% else %}2.1%{% endif %}
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">vs company avg</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                <span>Profit Range</span>
+                                <span>$30 - $80</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-indigo-600 dark:bg-indigo-400 h-2 rounded-full"
+                                     style="width: {{ ((item.Average_Profit_Per_Order - 30) / 50 * 100) }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+z
 
 
             </div>
@@ -207,14 +269,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const regionalData = {{ regional_sales_per_year | tojson | safe }};
-    console.log('Regional Sales Data:', regionalData); // Debug log
-
-    // Check if we have data to plot
-    if (!regionalData || regionalData.length === 0) {
-        document.getElementById('regionalSalesChart').innerHTML =
-            '<p class="text-center text-gray-500 dark:text-gray-300">No regional sales data available</p>';
-        return;
-    }
 
     // Sort regions by sales (descending)
     regionalData.sort((a, b) => b.Total_Sales - a.Total_Sales);
@@ -223,16 +277,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const sales = regionalData.map(item => item.Total_Sales);
 
     const ctx = document.getElementById('regionalSalesChart').getContext('2d');
-
-    // Theme colors
     const isDarkMode = document.documentElement.classList.contains('dark');
     const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
     const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+    // Enhanced color palette
     const barColors = [
-        'rgba(79, 70, 229, 0.8)',   // Indigo
-        'rgba(16, 185, 129, 0.8)',  // Emerald
-        'rgba(245, 158, 11, 0.8)',  // Amber
-        'rgba(236, 72, 153, 0.8)'   // Pink
+        'rgba(99, 102, 241, 0.8)',   // Vibrant Indigo
+        'rgba(16, 185, 129, 0.8)',   // Emerald
+        'rgba(245, 158, 11, 0.8)',   // Amber
+        'rgba(236, 72, 153, 0.8)'    // Pink
     ].map(color => isDarkMode ? color.replace('0.8', '0.7') : color);
 
     new Chart(ctx, {
@@ -240,13 +294,13 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             labels: regions,
             datasets: [{
-                label: 'Total Sales ($)',
+                label: 'Total Sales',
                 data: sales,
                 backgroundColor: barColors,
-                borderColor: barColors.map(color => color.replace('0.7', '1').replace('0.8', '1')),
+                borderColor: isDarkMode ? '#1e1b4b' : '#4f46e5',
                 borderWidth: 1,
-                borderRadius: 4,
-                barPercentage: 0.7
+                borderRadius: 6,
+                barPercentage: 0.8
             }]
         },
         options: {
@@ -254,7 +308,18 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            weight: '500',
+                            size: 12
+                        },
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    },
+                    onClick: () => {} // Disable legend click behavior
                 },
                 tooltip: {
                     backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
@@ -263,48 +328,78 @@ document.addEventListener('DOMContentLoaded', function() {
                     borderColor: isDarkMode ? '#374151' : '#e5e7eb',
                     borderWidth: 1,
                     padding: 12,
+                    displayColors: true,
+                    boxPadding: 4,
                     callbacks: {
-                        label: function(context) {
-                            return '$' + context.raw.toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
+                        title: (context) => `${context[0].label} Region`,
+                        label: (context) => {
+                            const value = context.raw;
+                            const formatted = value.toLocaleString('en-US', {
+                                style: 'currency',
+                                currency: 'USD',
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
                             });
-                        }
+                            return `Sales: ${formatted}`;
+                        },
+                        labelColor: (context) => ({
+                            borderColor: 'transparent',
+                            backgroundColor: barColors[context.dataIndex],
+                            borderRadius: 4
+                        })
                     }
                 }
             },
             scales: {
                 x: {
                     grid: {
-                        color: gridColor,
+                        display: false,
                         drawBorder: false
                     },
                     ticks: {
-                        color: textColor
+                        color: textColor,
+                        font: {
+                            weight: '500'
+                        }
                     }
                 },
                 y: {
                     beginAtZero: true,
                     grid: {
                         color: gridColor,
-                        drawBorder: false
+                        drawBorder: false,
+                        tickLength: 8
                     },
                     ticks: {
                         color: textColor,
-                        callback: function(value) {
-                            return '$' + (value / 1000).toFixed(0) + 'K';
+                        callback: (value) => '$' + (value / 1000).toFixed(0) + 'K',
+                        font: {
+                            weight: '500'
                         }
                     },
                     title: {
                         display: true,
-                        text: 'Sales Amount',
-                        color: textColor
+                        text: 'Sales Amount (USD)',
+                        color: textColor,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        padding: {top: 10, bottom: 10}
                     }
                 }
             },
             animation: {
                 duration: 1500,
                 easing: 'easeOutQuart'
+            },
+            layout: {
+                padding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10
+                }
             }
         }
     });

@@ -458,7 +458,7 @@ class RegionalAnalytics:
 
         query += """
             GROUP BY `Region`
-            HAVING COUNT(DISTINCT `Order ID`) > 0 -- Ensure there is at least one order
+            HAVING COUNT(DISTINCT `Order ID`) > 0 
         """
 
         with self.engine.connect() as connection:
@@ -555,7 +555,7 @@ class RegionalAnalytics:
                 Category AS Top_Selling_Category,
                 Total_Sales AS Total_Sales_In_Category
             FROM RegionalCategorySales
-            WHERE rn = 1; -- Select only the category with rank 1 for each region
+            WHERE rn = 1;
         """
 
         with self.engine.connect() as connection:
@@ -624,4 +624,4 @@ class RegionalAnalytics:
         return df.to_dict(orient='records')
 
 s = RegionalAnalytics()
-print(s.regional_sales_per_year())
+print(s.top_city_per_region())

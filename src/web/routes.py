@@ -222,8 +222,9 @@ def regions():
     average_order_value_per_region = regional_analytics.regional_average_order_value(start_date, end_date, ship_mode, country, city, state, segment)
     unique_customer_count_per_region = regional_analytics.regional_unique_customer_count(start_date, end_date, ship_mode, country, city, state, segment)
     regional_sales_per_year = regional_analytics.regional_sales_per_year(ship_mode, country, city, state, segment)
+    regional_average_profit_per_order = regional_analytics.regional_average_profit_per_order(start_date, end_date, ship_mode, country, city, state, segment)
     return render_template("web/regional_analytics.html", top_city_per_region=top_city_per_region,
                            average_order_value_per_region=average_order_value_per_region, unique_customer_count_per_region=unique_customer_count_per_region,
-                           regional_sales_per_year=regional_sales_per_year,
+                           regional_sales_per_year=regional_sales_per_year, regional_average_profit_per_order=regional_average_profit_per_order,
                            states=states, ship_modes=ship_modes, cities=cities, regions=regions, countries=countries, segments=segments,
                            categories=categories)
