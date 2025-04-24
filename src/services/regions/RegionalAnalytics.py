@@ -7,7 +7,6 @@ from src.db_connection.connection import DBConnection
 class RegionalAnalytics:
     def __init__(self):
         self.db_connection = DBConnection()
-        # Assuming create_db_connection returns a SQLAlchemy engine
         self.engine = self.db_connection.create_db_connection()
 
     def regional_sales_per_year(self, ship_mode=None, country=None, city=None,
@@ -45,7 +44,6 @@ class RegionalAnalytics:
         query += " GROUP BY `Region`"
 
         with self.engine.connect() as connection:
-            # Pass params to read_sql when using parameterized queries
             df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
@@ -622,6 +620,3 @@ class RegionalAnalytics:
             df = pd.read_sql(text(query), connection, params=params)
 
         return df.to_dict(orient='records')
-
-s = RegionalAnalytics()
-print(s.top_city_per_region())
