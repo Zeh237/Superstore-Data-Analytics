@@ -13,28 +13,28 @@
         <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-between">
                 <p class="text-gray-700 dark:text-white font-semibold">
-                    My Website
+                    SuperStore Analytics
                 </p>
                 <nav class="hidden md:block">
                     <ul class="flex items-center gap-6">
                         <li>
-                            <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
-                                Home
+                            <a href="{{ url_for('web.homepage') }}" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
+                                Sales Analytics
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
-                                About
+                            <a href="{{ url_for('web.categories') }}" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
+                                Category Analytics
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
-                                Services
+                            <a href="{{ url_for('web.regions') }}" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
+                                Regional Analytics
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
-                                Contact
+                            <a href="{{ url_for('web.segments') }}" class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white transition">
+                                Segment Analytics
                             </a>
                         </li>
                     </ul>
@@ -59,7 +59,7 @@
         <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 items-center justify-center">
                 <p class="text-gray-500 dark:text-white text-sm text-center">
-                    &copy; <span id="current-year"></span> Acme. All rights reserved.
+                    &copy; <span id="current-year"></span> SuperStore Analytics. All rights reserved.
                 </p>
             </div>
         </div>

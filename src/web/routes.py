@@ -3,12 +3,14 @@ from flask import Blueprint, request, render_template
 from src.services.categories.CategoryAnalysis import CategoryAnalysis
 from src.services.regions.RegionalAnalytics import RegionalAnalytics
 from src.services.sales_analysis.SalesAnalysis import SalesAnalysis
+from src.services.segments.SegmentAnalysis import Segments
 from src.utils.Utils import Utils
 
 sales_analytics = SalesAnalysis()
 category_analytics = CategoryAnalysis()
 utils = Utils()
 regional_analytics = RegionalAnalytics()
+segment_analytics = Segments()
 web = Blueprint('web', __name__)
 
 @web.route('/home')
@@ -228,3 +230,37 @@ def regions():
                            regional_sales_per_year=regional_sales_per_year, regional_average_profit_per_order=regional_average_profit_per_order,
                            states=states, ship_modes=ship_modes, cities=cities, regions=regions, countries=countries, segments=segments,
                            categories=categories)
+
+@web.route("/segments")
+def segments():
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    region = request.args.get("region")
+    country = request.args.get("country")
+    ship_mode = request.args.get("ship_mode")
+    segment = request.args.get("segment")
+    category = request.args.get("category")
+    sub_category = request.args.get("sub_category")
+    state = request.args.get("state")
+    city = request.args.get("city")
+
+    states = utils.get_state()
+    ship_modes = utils.get_ship_mode()
+    cities = utils.get_city()
+    regions = utils.get_region()
+    countries = utils.get_country()
+    categories = utils.get_category()
+    segments = utils.get_segment()
+
+    segment_performance_per_year = segment_analytics.segment_performance_per_year(ship_mode, country, city, state, region, category)
+    top_selling_category_per_segment = segment_analytics.top_selling_category_per_segment(ship_mode, country, city, state, region, category, start_date, end_date)
+    top_selling_city_per_segment = segment_analytics.top_selling_city_per_segment(ship_mode, country, city, state, region, category, start_date, end_date)
+    top_selling_state_per_segment = segment_analytics.top_selling_state_per_segment(ship_mode, country, city, state, region, category, start_date, end_date)
+    breakdown_by_ship_mode_per_segment = segment_analytics.breakdown_by_ship_mode_per_segment(ship_mode, country, city, state, region, category, start_date, end_date)
+    year_over_year_growth_per_segment = segment_analytics.year_over_year_growth_per_segment(ship_mode, country, city, state, region, category, start_date, end_date)
+
+    return render_template("web/segment_analytics.html", segment_performance_per_year=segment_performance_per_year, states=states,
+                           top_selling_category_per_segment=top_selling_category_per_segment, top_selling_city_per_segment = top_selling_city_per_segment,
+                           top_selling_state_per_segment = top_selling_state_per_segment, breakdown_by_ship_mode_per_segment=breakdown_by_ship_mode_per_segment,
+                           year_over_year_growth_per_segment=year_over_year_growth_per_segment,
+                           ship_modes=ship_modes, cities=cities, regions=regions, countries=countries, segments=segments, categories=categories)

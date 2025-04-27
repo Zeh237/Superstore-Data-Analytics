@@ -1,0 +1,669 @@
+{% extends 'layouts/app.html' %}
+{% block title %} Home {% endblock %}
+{% set active_page = "Sales" %}
+
+{% block content %}
+    <div class="bg-gray-100 dark:bg-gray-800">
+        <div class="mx-auto max-w-screen-xl py-8 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Segment Analytics</h1>
+
+            <!-- Main content container with consistent width -->
+            <div class="w-full space-y-4 mt-4">
+                <!-- Filters form -->
+                <form method="GET" action="{{ url_for('web.segments') }}" class="w-full bg-white dark:bg-gray-500 shadow-md rounded-md p-3">
+                    <div class="flex flex-wrap items-center justify-center gap-4">
+                        <div class="w-full sm:w-auto">
+                            <label for="start-date" class="text-sm text-gray-700 dark:text-gray-300">Start Date</label>
+                            <input type="date" id="start-date" name="start_date" value="{{ request.args.get('start_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="end-date" class="text-sm text-gray-700 dark:text-gray-300">End Date</label>
+                            <input type="date" id="end-date" name="end_date" value="{{ request.args.get('end_date', '') }}" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="city" class="text-sm text-gray-700 dark:text-gray-300">City</label>
+                            <select id="city" name="city" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Cities</option>
+                                {% for c in cities %}
+                                    <option value="{{ c }}" {% if request.args.get('city') == c %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="region" class="text-sm text-gray-700 dark:text-gray-300">Region</label>
+                            <select id="region" name="region" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Regions</option>
+                                {% for r in regions %}
+                                    <option value="{{ r }}" {% if request.args.get('region') == r %}selected{% endif %}>{{ r }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="state" class="text-sm text-gray-700 dark:text-gray-300">State</label>
+                            <select id="state" name="state" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All States</option>
+                                {% for s in states %}
+                                    <option value="{{ s }}" {% if request.args.get('state') == s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="country" class="text-sm text-gray-700 dark:text-gray-300">Country</label>
+                            <select id="country" name="country" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Countries</option>
+                                {% for co in countries %}
+                                    <option value="{{ co }}" {% if request.args.get('country') == co %}selected{% endif %}>{{ co }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="category" class="text-sm text-gray-700 dark:text-gray-300">Category</label>
+                            <select id="category" name="category" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Categories</option>
+                                {% for ca in categories %}
+                                    <option value="{{ ca }}" {% if request.args.get('category') == ca %}selected{% endif %}>{{ ca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="segment" class="text-sm text-gray-700 dark:text-gray-300">Segment</label>
+                            <select id="segment" name="segment" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Segments</option>
+                                {% for se in segments %}
+                                    <option value="{{ se }}" {% if request.args.get('segment') == se %}selected{% endif %}>{{ se }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto">
+                            <label for="ship_mode" class="text-sm text-gray-700 dark:text-gray-300">Ship Mode</label>
+                            <select id="ship_mode" name="ship_mode" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 text-sm dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <option value="">All Ship Modes</option>
+                                {% for sm in ship_modes %}
+                                    <option value="{{ sm }}" {% if request.args.get('ship_mode') == sm %}selected{% endif %}>{{ sm }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="w-full sm:w-auto flex items-end">
+                            <button type="submit" class="h-[42px] px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Segment Performance Over Years Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Segment Performance Over Years</h2>
+                    <div class="relative h-80">
+                        <canvas id="segmentPerformanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Selling Category Per Segment Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    {% for item in top_selling_category_per_segment %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Segment }}</h3>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {% if item.Category == 'Technology' %}bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200
+                                {% elif item.Category == 'Furniture' %}bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200
+                                {% else %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200{% endif %}">
+                                {{ item.Category }}
+                            </span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Top Category</p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-700 dark:text-gray-200 ml-7">{{ item.Category }}</p>
+
+                            <div class="flex items-center mt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Total Sales</p>
+                            </div>
+                            <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 ml-7">
+                                ${{ "%.2f" | format(item.sales) }}
+                            </p>
+
+                            <!-- Market Share Indicator -->
+                            <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                    <span>Segment Share</span>
+                                    <span>
+                                        {% if item.Segment == 'Consumer' %}48.2%
+                                        {% elif item.Segment == 'Corporate' %}29.1%
+                                        {% else %}22.7%{% endif %}
+                                    </span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-indigo-600 dark:bg-indigo-400 h-2 rounded-full"
+                                         style="width: {% if item.Segment == 'Consumer' %}48.2%{% elif item.Segment == 'Corporate' %}29.1%{% else %}22.7%{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Top Selling City Per Segment Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    {% for item in top_selling_city_per_segment %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Segment }}</h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6
+                                {% if item.Segment == 'Consumer' %}text-indigo-600 dark:text-indigo-400
+                                {% elif item.Segment == 'Corporate' %}text-emerald-600 dark:text-emerald-400
+                                {% else %}text-amber-600 dark:text-amber-400{% endif %}"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Top City</p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-700 dark:text-gray-200 ml-7">
+                                {{ item.City }}
+                            </p>
+
+                            <div class="flex items-center mt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Total Sales</p>
+                            </div>
+                            <p class="text-2xl font-bold
+                                {% if item.Segment == 'Consumer' %}text-indigo-600 dark:text-indigo-400
+                                {% elif item.Segment == 'Corporate' %}text-emerald-600 dark:text-emerald-400
+                                {% else %}text-amber-600 dark:text-amber-400{% endif %} ml-7">
+                                ${{ "%.2f" | format(item.sales) }}
+                            </p>
+
+                            <!-- Comparison to Segment Average -->
+                            <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center text-sm
+                                    {% if item.sales > 5000 %}text-emerald-600 dark:text-emerald-400
+                                    {% else %}text-amber-600 dark:text-amber-400{% endif %}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="{% if item.sales > 5000 %}M5 10l7-7m0 0l7 7m-7-7v18
+                                            {% else %}M19 14l-7 7m0 0l-7-7m7 7V3{% endif %}" />
+                                    </svg>
+                                    {% if item.sales > 5000 %}Above{% else %}Below{% endif %} segment average
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Top Selling State Per Segment Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    {% for item in top_selling_state_per_segment %}
+                    <div class="bg-white dark:bg-gray-500 shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ item.Segment }}</h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-medium px-2 py-1 rounded-full
+                                    {% if item.Segment == 'Consumer' %}bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200
+                                    {% elif item.Segment == 'Corporate' %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200
+                                    {% else %}bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200{% endif %}">
+                                    Top State
+                                </span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5
+                                    {% if item.Segment == 'Consumer' %}text-indigo-600 dark:text-indigo-400
+                                    {% elif item.Segment == 'Corporate' %}text-emerald-600 dark:text-emerald-400
+                                    {% else %}text-amber-600 dark:text-amber-400{% endif %}"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Top Performing State</p>
+                            </div>
+                            <p class="text-xl font-bold text-gray-700 dark:text-gray-200 ml-7">
+                                {{ item.State }}
+                            </p>
+
+                            <div class="flex items-center mt-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-sm text-gray-500 dark:text-gray-300">Total Sales</p>
+                            </div>
+                            <p class="text-2xl font-bold
+                                {% if item.Segment == 'Consumer' %}text-indigo-600 dark:text-indigo-400
+                                {% elif item.Segment == 'Corporate' %}text-emerald-600 dark:text-emerald-400
+                                {% else %}text-amber-600 dark:text-amber-400{% endif %} ml-7">
+                                ${{ "%.2f" | format(item.sales) }}
+                            </p>
+
+                            <!-- Regional Performance Indicator -->
+                            <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Regional Rank</span>
+                                    <span class="text-sm font-medium
+                                        {% if item.Segment == 'Consumer' %}text-indigo-600 dark:text-indigo-400
+                                        {% elif item.Segment == 'Corporate' %}text-emerald-600 dark:text-emerald-400
+                                        {% else %}text-amber-600 dark:text-amber-400{% endif %}">
+                                        #1 in Southeast
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Shipping Mode Breakdown by Segment Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Mode Preferences by Segment</h2>
+                    <div class="relative h-80">
+                        <canvas id="shipModeSegmentChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+                        * Shows percentage distribution of shipping methods within each customer segment
+                    </div>
+                </div>
+
+                <!-- YoY Growth by Segment Chart -->
+                <div class="bg-white dark:bg-gray-500 shadow-md rounded-md p-3 mt-4">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Year-over-Year Growth by Segment</h2>
+                    <div class="relative h-96">  <!-- Increased height for better visibility -->
+                        <canvas id="yoyGrowthChart"></canvas>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+                        * Growth rates calculated as percentage change from previous year
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer_script %}
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const segmentData = {{ segment_performance_per_year | tojson | safe }};
+
+    // Organize data by segment
+    const segments = [...new Set(segmentData.map(item => item.Segment))];
+    const years = [...new Set(segmentData.map(item => item.Year))].sort((a, b) => a - b);
+
+    // Prepare dataset for each segment
+    const datasets = segments.map((segment, index) => {
+        // Color scheme (matches your theme)
+        const colors = [
+            'rgba(99, 102, 241, 0.8)',    // Indigo (Consumer)
+            'rgba(16, 185, 129, 0.8)',    // Emerald (Corporate)
+            'rgba(245, 158, 11, 0.8)'     // Amber (Home Office)
+        ];
+        const darkColors = [
+            'rgba(79, 70, 229, 0.8)',     // Dark Indigo
+            'rgba(5, 150, 105, 0.8)',     // Dark Emerald
+            'rgba(217, 119, 6, 0.8)'      // Dark Amber
+        ];
+
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const color = isDarkMode ? darkColors[index % darkColors.length] : colors[index % colors.length];
+
+        return {
+            label: segment,
+            data: years.map(year => {
+                const item = segmentData.find(d => d.Year === year && d.Segment === segment);
+                return item ? item.sales : null;
+            }),
+            borderColor: color,
+            backgroundColor: 'transparent',
+            borderWidth: 3,
+            tension: 0.3,
+            pointBackgroundColor: color,
+            pointBorderColor: '#fff',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: false
+        };
+    });
+
+    const ctx = document.getElementById('segmentPerformanceChart').getContext('2d');
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: {
+                            weight: '500'
+                        },
+                        padding: 20,
+                        boxWidth: 12,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    bodyColor: isDarkMode ? '#e5e7eb' : '#111827',
+                    borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            label += '$' + context.raw.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    title: {
+                        display: true,
+                        text: 'Year',
+                        color: textColor
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Sales Amount ($)',
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: function(value) {
+                            return '$' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const shipModeData = {{ breakdown_by_ship_mode_per_segment | tojson | safe }};
+
+    // Organize data for chart
+    const segments = [...new Set(shipModeData.map(item => item.Segment))];
+    const shipModes = [...new Set(shipModeData.map(item => item['Ship Mode']))];
+
+    // Calculate percentages for each segment
+    const segmentTotals = {};
+    segments.forEach(segment => {
+        segmentTotals[segment] = shipModeData
+            .filter(item => item.Segment === segment)
+            .reduce((sum, item) => sum + item.sales, 0);
+    });
+
+    // Prepare dataset for each shipping mode
+    const datasets = shipModes.map((mode, index) => {
+        const colors = [
+            'rgba(99, 102, 241, 0.8)',   // Indigo
+            'rgba(16, 185, 129, 0.8)',   // Emerald
+            'rgba(245, 158, 11, 0.8)',   // Amber
+            'rgba(236, 72, 153, 0.8)'    // Pink
+        ];
+
+        return {
+            label: mode,
+            data: segments.map(segment => {
+                const item = shipModeData.find(d => d.Segment === segment && d['Ship Mode'] === mode);
+                const value = item ? item.sales : 0;
+                return (value / segmentTotals[segment] * 100).toFixed(1);
+            }),
+            backgroundColor: colors[index % colors.length],
+            borderColor: colors[index % colors.length].replace('0.8', '1'),
+            borderWidth: 1,
+            borderRadius: 4
+        };
+    });
+
+    const ctx = document.getElementById('shipModeSegmentChart').getContext('2d');
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: segments,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'x',
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: { display: false },
+                    ticks: { color: textColor }
+                },
+                y: {
+                    stacked: true,
+                    max: 100,
+                    ticks: {
+                        color: textColor,
+                        callback: (value) => value + '%'
+                    },
+                    grid: { color: gridColor }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const label = context.dataset.label || '';
+                            const value = context.raw;
+                            const sales = shipModeData.find(
+                                d => d.Segment === context.label &&
+                                d['Ship Mode'] === label
+                            ).sales;
+                            return `${label}: ${value}% ($${sales.toLocaleString()})`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: false // Disable if you don't want direct labels
+                }
+            }
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const growthData = {{ year_over_year_growth_per_segment | tojson | safe }};
+
+    // Filter out NaN values and organize by segment
+    const segments = [...new Set(growthData.map(item => item.Segment))];
+    const years = [...new Set(growthData.map(item => item.year))].sort();
+
+    // Prepare dataset for each segment
+    const datasets = segments.map(segment => {
+        const segmentColor = {
+            'Consumer': 'rgba(99, 102, 241, 0.8)',
+            'Corporate': 'rgba(16, 185, 129, 0.8)',
+            'Home Office': 'rgba(245, 158, 11, 0.8)'
+        }[segment];
+
+        const darkColor = {
+            'Consumer': 'rgba(79, 70, 229, 0.8)',
+            'Corporate': 'rgba(5, 150, 105, 0.8)',
+            'Home Office': 'rgba(217, 119, 6, 0.8)'
+        }[segment];
+
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const color = isDarkMode ? darkColor : segmentColor;
+
+        return {
+            label: segment,
+            data: years.map(year => {
+                const item = growthData.find(d => d.year === year && d.Segment === segment);
+                return item ? item.growth_rate * 100 : null; // Convert to percentage
+            }),
+            borderColor: color,
+            backgroundColor: 'transparent',
+            borderWidth: 3,
+            tension: 0.3,
+            pointBackgroundColor: color,
+            pointBorderColor: '#fff',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: false
+        };
+    });
+
+    const ctx = document.getElementById('yoyGrowthChart').getContext('2d');
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#1f2937';
+    const gridColor = isDarkMode ? 'rgba(229, 231, 235, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+    const zeroLineColor = isDarkMode ? 'rgba(239, 68, 68, 0.7)' : 'rgba(220, 38, 38, 0.7)';
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: textColor,
+                        font: { weight: '500' },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const label = context.dataset.label || '';
+                            const value = context.raw;
+                            const item = growthData.find(
+                                d => d.year === years[context.dataIndex] &&
+                                d.Segment === label
+                            );
+                            let tooltip = `${label}: ${value?.toFixed(1) || 'N/A'}%`;
+                            if (item) {
+                                tooltip += ` (Sales: $${item.total_sales.toLocaleString('en-US', {maximumFractionDigits: 0})})`;
+                            }
+                            return tooltip;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: gridColor },
+                    ticks: { color: textColor }
+                },
+                y: {
+                    title: {
+                        text: 'Growth Rate (%)',
+                        color: textColor
+                    },
+                    ticks: {
+                        color: textColor,
+                        callback: (value) => value + '%'
+                    },
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    position: 'left'
+                }
+            },
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            }
+        }
+    });
+});
+
+
+
+
+</script>
+{% endblock %}
