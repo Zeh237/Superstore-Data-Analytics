@@ -1,6 +1,6 @@
-# Sales Analytics Dashboard
+# Superstore Data Analytics Dashboard
 
-A Flask-based web application providing interactive dashboards for analyzing sales data across various dimensions like time, geography, categories, and customer segments.
+A Flask-based web application providing interactive dashboards for analyzing superstore sales data across various dimensions like time, geography, categories, and customer segments.
 
 ## Table of Contents
 - [About](#about)
@@ -105,7 +105,7 @@ Before you begin, ensure you have the following installed:
 
 4.  **Database Setup:**
 
-    * In the root directory of the project you will see a db.sql file, import it into your database using mysqlworkbench or any tool of your choice
+    * In the root directory of the project you will see a db.sql file, it contains all the superstore data needed for this project. Import it into your database using mysqlworkbench or any tool of your choice
     * Head on to the .env file and specify your database credentials. the .env.example will help you. The env file should look like this
       
     ![image](https://github.com/user-attachments/assets/44bb9bc8-9978-4bdb-9f8d-37fd2e245329)
